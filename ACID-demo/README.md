@@ -25,5 +25,5 @@ docker-compose up -d
 
 ## Run the Demo 
 
-npm run build
-npm start
+- npm run build
+- npm start

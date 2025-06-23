@@ -1,5 +1,15 @@
 import { pool, initSchema } from "./db";
 
+
+
+
+/**
+ * Demonstrates Atomicity:
+ * Ensures that either all operations in a transaction succeed or none do.
+ * In this case, trying to insert a duplicate username will violate a constraint
+ * and cause the entire transaction to rollback — leaving the database unchanged.
+ */
+
 async function demonstrateAtomicity() {
   console.log('\n== Atomicity Demo ==');
   const client = await pool.connect();
@@ -18,10 +28,17 @@ async function demonstrateAtomicity() {
   console.log('Users named alice after transaction:', res.rows);
 }
 
+/**
+ * Demonstrates Consistency:
+ * Enforces that any transaction brings the database from one valid state to another.
+ * This will violate a foreign key constraint — thus rolled back.
+ */
+
+
 async function demonstrateConsistency() {
   console.log('\n== Consistency Demo ==');
   const client = await pool.connect();
-  try {
+  try { // here we are trying to insert a post with a user_id and some content , but it will rollback as there are no user with the user_id = 999 , it violates foreign key constraint
     await client.query('BEGIN');
     await client.query(`INSERT INTO posts(user_id, content) VALUES($1, $2)`, [999, 'Ghost post']);
     await client.query('COMMIT');
@@ -34,6 +51,13 @@ async function demonstrateConsistency() {
   const res = await pool.query(`SELECT * FROM posts`);
   console.log('Posts table contents:', res.rows);
 }
+
+/**
+ * Demonstrates Isolation:
+ * Ensures that concurrent transactions don't interfere with each other.
+ * We'll run two parallel transactions — one inserts a row, the other tries to read it.
+ * We’ll show that Txn2 can't see uncommitted changes made by Txn1.
+ */
 
 async function demonstrateIsolation() {
   console.log('\n== Isolation Demo ==');
@@ -65,6 +89,12 @@ async function demonstrateIsolation() {
     client2.release();
   }
 }
+/**
+ * Demonstrates Durability:
+ * Once a transaction is committed, it remains so — even after crashes.
+ * Here, we insert "carol" and commit. After restarting the DB,
+ * we expect "carol" to still be present.
+ */
 
 async function demonstrateDurability() {
   console.log('\n== Durability Demo ==');

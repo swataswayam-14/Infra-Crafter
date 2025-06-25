@@ -126,3 +126,5 @@ export class ReplicationService {
         }
     }
 }
+
+export const replicationService = new ReplicationService();

@@ -14,12 +14,14 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.5.0",
-    "pg": "^8.16.2"
+    "pg": "^8.16.2",
+    "pino": "^9.7.0"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.1",
     "@types/node": "^24.0.4",
     "@types/pg": "^8.15.4",
+    "@types/pino": "^7.0.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

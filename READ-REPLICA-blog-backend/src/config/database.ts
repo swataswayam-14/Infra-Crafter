@@ -99,6 +99,9 @@ class DatabaseManager {
             return false;
         }
     }
+    getReplicaPool(): Pool[] {
+        return this.replicaPools;
+    }
     
     async closeAll(): Promise<void> {
         await this.masterPool.end();

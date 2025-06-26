@@ -46,7 +46,10 @@ export class ReplicationService {
             //wait for replication to all replicas
             const replicaPool:Pool[] = dbManager.getReplicaPool();
              
-            const replicationPromises = replicaPool.map(replicaDB => this.waitForReplication(query, params, replicaDB))
+const replicationPromises = replicaPool.map((replicaDB, index) => 
+  this.waitForReplication(query, params, replicaDB, index + 1)
+);
+
 
             //wait for all replicas with timeout
             //this is to ensure a strict timeout on replication, without it, a slow or hanging replica could block the master transaction indefinitely.
@@ -65,20 +68,22 @@ export class ReplicationService {
             client.release();
         }
     }
-    private async waitForReplication(query:string, params: any[], replicaDB: Pool) {
+    private async waitForReplication(query: string, params: any[], replicaDB: Pool, replicaIndex: number)
+ {
         let attempts = 0;
         const maxAttempts = 10;
 
         while(attempts < maxAttempts) {
-            let i = 1;
             try {
-                await replicaDB.query(query, params);
-                logger.debug(`Replica ${i++} replicated query: ${query}`);
-            } catch (error:any) {
-                attempts++;
-                logger.warn(`Attempt ${attempts} failed for Replica: ${i++} replication: ${error.message}`);
-                await new Promise(res => setTimeout(res, 100)); // 100ms delay before retry
-            }
+    await replicaDB.query(query, params);
+    logger.debug(`Replica ${replicaIndex} replicated query: ${query}`);
+    return;
+} catch (error: any) {
+    attempts++;
+    logger.warn(`Attempt ${attempts} failed for Replica ${replicaIndex}: ${error?.message || error}`);
+    await new Promise(res => setTimeout(res, 100));
+}
+
         }
         throw new Error('max replication attempts exceeded for a replica');
     }
@@ -90,18 +95,19 @@ export class ReplicationService {
         const result = await masterDB.query(query, params);
         logger.debug(`Write query executed on master: ${query}`);
         const replicaPool = dbManager.getReplicaPool();
-        let i = 0;
-        Promise.all(
-            replicaPool.map(async(replicaDB) => {
-                i++;
-                try {
-                    await replicaDB.query(query, params)
-                } catch (error) {
-                    logger.error({error}, `Async replication to replica ${i} failed`);
-                    this.retryReplication(query, params,replicaDB, i);
-                }
-            })
-        ).catch(error => logger.error({error}, 'some async replication failed'));
+        await Promise.all(
+    replicaPool.map(async (replicaDB, index) => {
+        const replicaIndex = index + 1;
+        try {
+            await replicaDB.query(query, params);
+            logger.info(`Async replication to replica ${replicaIndex} succeeded`);
+        } catch (error:any) {
+            logger.error(`Async replication to replica ${replicaIndex} failed: ${error?.message || error}`);
+            this.retryReplication(query, params, replicaDB, replicaIndex);
+        }
+    })
+);
+
         return result;
     }
     private async retryReplication(
@@ -121,8 +127,8 @@ export class ReplicationService {
             await new Promise(resolve => setTimeout(resolve, delay));
             await replicaDB.query(query, params);
             logger.info(`Retry ${attempt} successful for replica ${replicationIndex}`);
-        } catch (error) {
-            logger.warn({error}, `Retry ${attempt} failed for replica ${replicationIndex}`);
+        } catch (error:any) {
+            logger.warn(`Retry ${attempt} failed for replica ${replicationIndex}: ${error?.message || error}`);
         }
     }
 }

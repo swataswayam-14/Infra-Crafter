@@ -1,8 +1,18 @@
 import { databaseService } from './services/database.service';
+import { dbManager } from './config/database';
 import logger from './utils/logger';
 
 async function main() {
   try {
+    const {master, replicas} = await dbManager.healthCheck();
+
+    if(master === true) logger.info("Master Database is healthy");
+    else logger.warn("Master database is not healthy");
+    if(replicas[0] === true) logger.info("Replica 1 is healthy");
+    else logger.warn("Replica 1 is not healthy");
+    if(replicas[1] === true) logger.info("Replica 2 is healthy");
+    else logger.warn("Replica 2 is not healthy");
+    
     const readResult = await databaseService.query(
       'SELECT * FROM users LIMIT 5;',
       [],

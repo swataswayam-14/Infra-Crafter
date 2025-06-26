@@ -34,7 +34,7 @@ export const configuration = {
   ],
   
   replication: {
-    strategy: process.env.REPLICATION_STRATEGY || 'sync', // 'sync' or 'async'
+    strategy: process.env.REPLICATION_STRATEGY || 'async', // 'sync' or 'async'
     syncTimeout: parseInt(process.env.SYNC_TIMEOUT || '5000'),
     maxRetries: parseInt(process.env.MAX_RETRIES || '3'),
   },

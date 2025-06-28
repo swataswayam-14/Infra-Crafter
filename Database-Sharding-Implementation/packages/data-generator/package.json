@@ -1,0 +1,23 @@
+{
+  "name": "data-generator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "pg": "^8.16.3",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.7",
+    "@types/pg": "^8.15.4",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.8.3"
+  }
+}

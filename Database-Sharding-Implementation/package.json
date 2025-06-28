@@ -1,0 +1,17 @@
+{
+  "name": "database-sharding-implementation",
+  "version": "1.0.0",
+  "description": "Horizontal scaling with sharding implementation",
+  "scripts": {
+    "start:api": "cd packages/api-gateway && npm start",
+    "start:analytics": "cd packages/analytics-server && npm start",
+    "generate:data": "cd packages/data-generator && npm start",
+    "test:load": "cd packages/load-tester && npm start",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

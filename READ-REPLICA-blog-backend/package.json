@@ -3,10 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "db:init": "node dist/init-db.js",
-    "db:test": "node dist/main.js",
-    "build": "npx tsc"
-  },
+  "build": "npx tsc",
+  "db:init": "node dist/init-db.js",
+  "db:test": "node dist/cli.js",
+  "db:test:complete": "node dist/cli.js run",
+  "db:test:replication": "node dist/cli.js replication",
+  "db:test:write": "node dist/cli.js write",
+  "db:test:read": "node dist/cli.js read",
+  "db:test:health": "node dist/cli.js health",
+  "db:test:load": "node dist/cli.js high-load",
+  "db:test:overload": "node dist/cli.js overload"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,9 +28,12 @@
     "pino": "^9.7.0"
   },
   "devDependencies": {
+    "@types/chalk": "^0.4.31",
+    "@types/commander": "^2.12.0",
     "@types/dotenv": "^6.1.1",
     "@types/inquirer": "^9.0.8",
     "@types/node": "^24.0.4",
+    "@types/ora": "^3.1.0",
     "@types/pg": "^8.15.4",
     "@types/pino": "^7.0.4",
     "dotenv": "^16.5.0",

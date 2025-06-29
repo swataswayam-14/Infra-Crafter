@@ -1,0 +1,44 @@
+services:
+  master-db:
+    image: postgres:15-alpine
+    container_name: master-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${MASTER_DB_NAME:-blog_master}
+      POSTGRES_USER: ${MASTER_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${MASTER_DB_PASSWORD:-password}
+    ports:
+      - "${MASTER_DB_PORT:-5432}:5432"
+    volumes:
+      - master-data:/var/lib/postgresql/data
+
+  replica1-db:
+    image: postgres:15-alpine
+    container_name: replica1-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${REPLICA1_DB_NAME:-blog_replica1}
+      POSTGRES_USER: ${REPLICA1_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${REPLICA1_DB_PASSWORD:-password}
+    ports:
+      - "${REPLICA1_DB_PORT:-5433}:5432"
+    volumes:
+      - replica1-data:/var/lib/postgresql/data
+
+  replica2-db:
+    image: postgres:15-alpine
+    container_name: replica2-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${REPLICA2_DB_NAME:-blog_replica2}
+      POSTGRES_USER: ${REPLICA2_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${REPLICA2_DB_PASSWORD:-password}
+    ports:
+      - "${REPLICA2_DB_PORT:-5434}:5432"
+    volumes:
+      - replica2-data:/var/lib/postgresql/data
+
+volumes:
+  master-data:
+  replica1-data:
+  replica2-data:

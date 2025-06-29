@@ -1,44 +1,60 @@
-import { databaseService } from './services/database.service';
-import logger from './utils/logger';
+import { Client } from 'pg';
+import fs from 'fs';
+import ora from 'ora';
+import chalk from 'chalk';
 
-async function initializeDatabase() {
+const sqlFilePath = './init.sql';
+const sql = fs.readFileSync(sqlFilePath, 'utf-8');
+
+// Database configurations
+const databases = [
+  {
+    name: 'Master DB',
+    host: process.env.MASTER_DB_HOST || 'localhost',
+    port: parseInt(process.env.MASTER_DB_PORT || '5432'),
+    database: process.env.MASTER_DB_NAME || 'blog_master',
+    user: process.env.MASTER_DB_USER || 'postgres',
+    password: process.env.MASTER_DB_PASSWORD || 'password',
+  },
+  {
+    name: 'Replica 1',
+    host: process.env.REPLICA1_DB_HOST || 'localhost',
+    port: parseInt(process.env.REPLICA1_DB_PORT || '5433'),
+    database: process.env.REPLICA1_DB_NAME || 'blog_replica1',
+    user: process.env.REPLICA1_DB_USER || 'postgres',
+    password: process.env.REPLICA1_DB_PASSWORD || 'password',
+  },
+  {
+    name: 'Replica 2',
+    host: process.env.REPLICA2_DB_HOST || 'localhost',
+    port: parseInt(process.env.REPLICA2_DB_PORT || '5434'),
+    database: process.env.REPLICA2_DB_NAME || 'blog_replica2',
+    user: process.env.REPLICA2_DB_USER || 'postgres',
+    password: process.env.REPLICA2_DB_PASSWORD || 'password',
+  }
+];
+
+async function initDatabase(dbConfig: any) {
+  const client = new Client(dbConfig);
+  const spinner = ora(`Initializing ${dbConfig.name}...`).start();
+
   try {
-    await databaseService.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100),
-        email VARCHAR(100),
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `, [], 'write');
-
-    await databaseService.query(`
-      CREATE TABLE IF NOT EXISTS test_table (
-        id SERIAL PRIMARY KEY,
-        message TEXT,
-        created_at TIMESTAMP DEFAULT NOW()
-      );
-    `, [], 'write');
-
-    await databaseService.query(`
-      INSERT INTO users (name, email)
-      VALUES 
-        ('Alice', 'alice@example.com'),
-        ('Bob', 'bob@example.com'),
-        ('Charlie', 'charlie@example.com');
-    `, [], 'write');
-
-    await databaseService.query(`
-      INSERT INTO test_table (message)
-      VALUES 
-        ('Hello from test_table!'),
-        ('Another message here.');
-    `, [], 'write');
-
-    logger.info('Database initialized with sample data.');
-  } catch (error) {
-    logger.error({error},'Error initializing database:');
+    await client.connect();
+    await client.query(sql);
+    spinner.succeed(`${dbConfig.name} initialized successfully ✅`);
+  } catch (err: any) {
+    spinner.fail(`${dbConfig.name} failed ❌`);
+    console.error(chalk.red(err.message));
+  } finally {
+    await client.end();
   }
 }
 
-initializeDatabase();
+async function run() {
+  for (const db of databases) {
+    await initDatabase(db);
+  }
+  console.log(chalk.green('\n🎉 All databases initialized.\n'));
+}
+
+run();

@@ -1,0 +1,51 @@
+services:
+  shard1-primary:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: shard1
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports: ["5432:5432"]
+
+  shard1-replica:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: shard1
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports: ["5433:5432"]
+    depends_on: [shard1-primary]
+
+  shard2-primary:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: shard2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports: ["5434:5432"]
+
+  shard2-replica:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: shard2
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports: ["5435:5432"]
+    depends_on: [shard2-primary]
+
+  shard3-primary:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: shard3
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports: ["5436:5432"]
+
+  shard3-replica:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: shard3
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports: ["5437:5432"]
+    depends_on: [shard3-primary]

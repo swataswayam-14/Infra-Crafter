@@ -7,6 +7,9 @@ export class RouterService {
     constructor(shardManager: ShardManager) {
         this.shardManager = shardManager;
     }
+    getShardManager(): ShardManager {
+        return this.shardManager;
+    }
     extractShardKey = (req:Request, res:Response, next: NextFunction) => {
         const shardKey = req.headers['x-shard-key'] as string || req.query.shardKey as string || req.body?.shardKey;
         if(!shardKey) return res.status(400).json({
@@ -18,7 +21,8 @@ export class RouterService {
 
     handleWrite = async(req:Request, res:Response) => {
         try {
-            const {table, data, shardKey} = req.body;
+            const {table, data } = req.body;
+            const shardKey = req.shardKey;
             if(!table || !data || !shardKey) return res.status(400).json({
                 error: 'Table, data and shardKey are required'
             });

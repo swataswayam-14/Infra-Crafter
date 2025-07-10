@@ -34,14 +34,31 @@ export class AnalyticsService {
     recordRead(shard: string, duration: number): void {
         this.addMetric('read', shard, duration, true);
     }
-    recordError(operation: string, error: Error): void {
+    recordError(operation: string, error: any): void {
+        let message = 'Unknown error';
+        let stack = '';
+    
+        if (error instanceof Error) {
+            message = error.message;
+            stack = error.stack || '';
+        } else if (typeof error === 'object') {
+            try {
+                message = JSON.stringify(error, Object.getOwnPropertyNames(error));
+            } catch (e) {
+                message = String(error);
+            }
+        } else {
+         message = String(error);
+        }
+
         this.errors.push({
             timestamp: Date.now(),
             operation,
-            error: error.message,
-            stack: error.stack
+            error: message,
+            stack
         });
-        if(this.errors.length > 1000) {
+
+        if (this.errors.length > 1000) {
             this.errors = this.errors.slice(-1000);
         }
     }

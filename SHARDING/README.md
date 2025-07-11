@@ -2,7 +2,7 @@
 
 A complete TypeScript implementation of a horizontally scaled database system with sharding, replication, and load balancing.
 
-## 🏗️ Architecture
+## Architecture
 
 ### Sharding Strategy
 - **Shard 1**: Partitions A (30MB) + B (20MB) = 50MB total
@@ -15,12 +15,15 @@ A complete TypeScript implementation of a horizontally scaled database system wi
 - **Analytics Service**: Monitors performance and system health
 - **Load Balancer**: Distributes requests across shards
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Setup
 ```bash
 # Install dependencies
 npm install
+
+# Build
+npm run build
 
 # Start databases
 docker-compose up -d
@@ -42,7 +45,21 @@ npm run dev
 npm run load-test
 ```
 
-## 📡 API Endpoints
+# OR
+### Run the setup script
+
+- Make the setup script executable 
+
+```bash
+chmod +x setup.sh
+```
+- Run the setup script
+
+```bash
+./setup.sh
+```
+
+## API Endpoints
 
 ### Data Operations
 - `POST /api/write` - Write data to appropriate shard
@@ -86,7 +103,7 @@ Update `src/config/sharding.ts` to modify partition distribution.
 ### Load Testing
 Configure test parameters in `src/test/load-test.ts`.
 
-## 📊 Monitoring
+## Monitoring
 
 The system includes built-in analytics:
 - Request latency tracking
@@ -96,7 +113,7 @@ The system includes built-in analytics:
 
 Access metrics at: `http://localhost:3000/api/analytics/metrics`
 
-## 🐳 Docker Services
+## Docker Services
 
 - **PostgreSQL Shards**: 3 primary databases (ports 5432, 5434, 5436)
 - **Read Replicas**: 3 replica databases (ports 5433, 5435, 5437)
@@ -106,24 +123,6 @@ Access metrics at: `http://localhost:3000/api/analytics/metrics`
 - **Horizontal**: Distribute rows based on user ID hash
 - **Vertical**: Separate tables by access patterns
 - **Hybrid**: Combine both strategies for optimal performance
-
-
-## 🛠️ Development
-
-```bash
-# Build
-npm run build
-
-# Start production
-npm run start
-
-# Database operations
-npm run setup-db
-npm run generate-data
-
-# Testing
-npm run load-test
-```
 
 ## Key Features:
 

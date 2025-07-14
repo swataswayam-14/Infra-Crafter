@@ -1,4 +1,5 @@
 import { ShardConfig } from "./config/Sharding";
+import {createHash} from 'crypto';
 
 export class ConsistentHashing {
     static readonly SHARDS: ShardConfig[] = [
@@ -28,14 +29,9 @@ export class ConsistentHashing {
     private static ring: Map<number, ShardConfig> =  new Map();
     private static initialised = false;
 
-    private static hashKey(key:string): number {
-        let hash = 0;
-        for (let i = 0; i < key.length; i++) {
-            const char  = key.charCodeAt(i);
-            hash = ((hash << 5)- hash) + char;
-            hash = hash & hash;
-        }
-        return Math.abs(hash);
+    private static hashKey(key: string): number {
+        const hash = createHash('sha256').update(key).digest('hex').slice(0, 8);
+        return parseInt(hash, 16);
     }
 
     private static initializeRing(): void {
